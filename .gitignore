@@ -1,0 +1,4 @@
+www/
+secrets/
+.env
+letsencrypt/

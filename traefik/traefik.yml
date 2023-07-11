@@ -1,0 +1,51 @@
+log:
+  level: debug
+  filePath: "/logs/traefik.log"
+
+api:
+  dashboard: false
+  insecure: false
+
+providers:
+  docker:
+    endpoint: tcp://docker-proxy:2375
+    exposedByDefault: false
+    network: t2
+  file:
+    directory: "/rules"
+    watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: prime-resolver
+        domains:
+          - main: statbus.space
+            sans:
+              - "*.statbus.space"
+
+certificatesResolvers:
+  prime-resolver:
+    acme:
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      storage: /etc/letsencrypt/acme.json
+      dnsChallenge:
+        provider: digitalocean
+        delayBeforeCheck: 0
+# http:
+#   routers:
+#     dashboard:
+#       rule: Host(`traefik.statbus.space`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+#       service: api@internal
+  #     middlewares:
+  #       - auth
+  # middlewares:
+  #   auth:   
+  #     basicAuth:
+  #       users:
+  #         - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+  #         - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
