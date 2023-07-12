@@ -90,12 +90,13 @@ services:
       - /var/log/nginx:/var/log/nginx
       - $DOCKERDIR/nginx:/etc/nginx
       - $WWWDIR/renderbus.statbus.space:/var/www/html/renderbus.statbus.space
+      - $WWWDIR/gallery.statbus.space:/var/www/html/gallery.statbus.space
       - $WWWDIR/badger.statbus.space:/var/www/html/badger.statbus.space
       - $WWWDIR/statbus.space:/var/www/html/statbus.space
     labels:
       - traefik.enable=true
       - traefik.http.routers.nginx-rtr.entrypoints=websecure
-      - traefik.http.routers.nginx-rtr.rule=(Host(`statbus.space`,`badger.statbus.space`,`renderbus.statbus.space`))
+      - traefik.http.routers.nginx-rtr.rule=(Host(`statbus.space`,`badger.statbus.space`,`gallery.statbus.space`,`renderbus.statbus.space`))
       - traefik.http.routers.nginx-rtr.tls.certresolver=prime-resolver
       - traefik.http.routers.nginx-rtr.service=nginx-svc
       - traefik.http.services.nginx-svc.loadbalancer.server.port=80
