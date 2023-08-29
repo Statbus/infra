@@ -2,3 +2,4 @@ www/
 secrets/
 .env
 letsencrypt/
+mariadb/
