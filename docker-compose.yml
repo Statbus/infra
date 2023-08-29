@@ -17,6 +17,14 @@ networks:
 secrets:
   do_token:
     file: $SECRETSDIR/do_token
+  mariadb_root_password:
+    file: $SECRETSDIR/mariadb_root_password
+  mariadb_password:
+    file: $SECRETSDIR/mariadb_password
+  mariadb_database:
+    file: $SECRETSDIR/mariadb_database
+  mariadb_user:
+    file: $SECRETSDIR/mariadb_user
 services:
   docker-proxy:
     restart: unless-stopped
@@ -83,7 +91,8 @@ services:
       - php
     container_name: nginx
     networks:
-      - t2
+      t2:
+        ipv4_address: 192.168.90.5
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -111,8 +120,33 @@ services:
     user: $PUID:$PGID
     networks:
       t2:
-        ipv4_address: 192.168.90.2
+        ipv4_address: 192.168.90.3
     volumes:
       - /home/atlantaned/tgstation:/tg
       - $WWWDIR/badger.statbus.space:/var/www/html/badger.statbus.space
+      - $WWWDIR/matomo.statbus.space:/var/www/html/matomo.statbus.space
       - $WWWDIR/statbus.space:/var/www/html/statbus.space
+  mariadb:
+    restart: unless-stopped
+    container_name: mariadb
+    image: mariadb:11.0
+    command: --max_allowed_packet=67136000
+    networks:
+      t2:
+        ipv4_address: 192.168.90.4
+      default:
+    ports:
+      - 127.0.0.1:3306:3306 #Required for SQL client
+    volumes:
+      - $DOCKERDIR/mariadb:/var/lib/mysql
+    secrets:
+      - mariadb_root_password
+      - mariadb_password
+      - mariadb_database
+      - mariadb_user
+    environment:
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
+      - MARIADB_PASSWORD_FILE=/run/secrets/mariadb_password
+      - MARIADB_DATABASE_FILE=/run/secrets/mariadb_database
+      - MARIADB_USERE_FILE=/run/secrets/mariadb_user
+      - MARIADB_MYSQL_LOCALHOST_USER=true
